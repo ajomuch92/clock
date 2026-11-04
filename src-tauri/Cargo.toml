@@ -1,9 +1,9 @@
 [package]
 name = "my-clock"
-version = "0.1.0"
+version = "0.1.1"
 description = "A personal clock to track the working time"
 authors = ["ajomuch92"]
-edition = "2026"
+edition = "2024"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

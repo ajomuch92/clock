@@ -70,6 +70,18 @@
         </div>
       </div>
 
+      <!-- Initial time (only while stopped); start() resumes from elapsedTime -->
+      <label v-if="!isRunning" class="initial-time">
+        Tiempo inicial
+        <input
+          id="input-initial-time"
+          type="time"
+          step="1"
+          :value="formatTime(elapsedTime).hours + ':' + formatTime(elapsedTime).minutes + ':' + formatTime(elapsedTime).seconds"
+          @change="elapsedTime = ($event.target as HTMLInputElement).valueAsNumber || 0"
+        />
+      </label>
+
       <!-- Controls -->
       <div class="controls">
         <!-- Start / Pause / Resume -->
@@ -546,6 +558,23 @@ const statusClass = computed(() => {
   color: rgba(255, 255, 255, 0.22);
   letter-spacing: 0.05em;
   font-weight: 400;
+}
+
+.initial-time {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+.initial-time input {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 0.3rem 0.5rem;
+  color: #fff;
+  color-scheme: dark;
+  font-family: inherit;
 }
 
 /* ─── Responsive ───────────────────────────────── */

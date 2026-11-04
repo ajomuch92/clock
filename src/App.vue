@@ -71,16 +71,20 @@
       </div>
 
       <!-- Initial time (only while stopped); start() resumes from elapsedTime -->
-      <label v-if="!isRunning" class="initial-time">
+      <div v-if="!isRunning" class="initial-time">
         Tiempo inicial
-        <input
-          id="input-initial-time"
-          type="time"
-          step="1"
-          :value="formatTime(elapsedTime).hours + ':' + formatTime(elapsedTime).minutes + ':' + formatTime(elapsedTime).seconds"
-          @change="elapsedTime = ($event.target as HTMLInputElement).valueAsNumber || 0"
-        />
-      </label>
+        <label v-for="(label, unit) in unitLabels" :key="unit">
+          <input
+            :id="`input-initial-${unit}`"
+            type="number"
+            min="0"
+            :max="unit === 'hours' ? undefined : 59"
+            :value="Number(time[unit])"
+            @change="setPart(unit, ($event.target as HTMLInputElement).valueAsNumber)"
+          />
+          {{ label }}
+        </label>
+      </div>
 
       <!-- Controls -->
       <div class="controls">
@@ -162,6 +166,15 @@ const {
 } = useStopwatch();
 
 const time = computed(() => formatTime(elapsedTime.value));
+
+const unitLabels = { hours: 'h', minutes: 'm', seconds: 's' } as const;
+const unitMs = { hours: 3600000, minutes: 60000, seconds: 1000 };
+
+// Replace one unit of the starting time, keeping the other two
+function setPart(unit: keyof typeof unitMs, value: number): void {
+  const n = Math.max(0, Math.floor(value || 0));
+  elapsedTime.value += (n - Number(time.value[unit])) * unitMs[unit];
+}
 
 // Progress ring: 60s = full rotation
 const circumference = 2 * Math.PI * 120; // r=120
@@ -575,6 +588,8 @@ const statusClass = computed(() => {
   color: #fff;
   color-scheme: dark;
   font-family: inherit;
+  width: 3.5rem;
+  text-align: center;
 }
 
 /* ─── Responsive ───────────────────────────────── */

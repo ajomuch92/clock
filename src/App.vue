@@ -142,6 +142,26 @@
         </button>
       </div>
 
+      <!-- Add time (only while paused) -->
+      <template v-if="isPaused">
+        <button
+          v-if="!showAdd"
+          id="btn-add-time"
+          @click="showAdd = true"
+          class="btn btn-reset"
+        >
+          <span>+ Agregar tiempo</span>
+        </button>
+        <form v-else class="initial-time" @submit.prevent="confirmAdd">
+          <label v-for="(label, unit) in unitLabels" :key="unit">
+            <input :id="`input-add-${unit}`" type="number" min="0" v-model.number="toAdd[unit]" />
+            {{ label }}
+          </label>
+          <button type="submit" class="btn btn-resume">Aceptar</button>
+          <button type="button" class="btn btn-reset" @click="showAdd = false">Cancelar</button>
+        </form>
+      </template>
+
       <!-- Elapsed time in seconds label -->
       <div class="elapsed-label" v-if="elapsedTime > 0">
         {{ (elapsedTime / 1000).toFixed(2) }}s transcurridos
@@ -151,7 +171,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, reactive, ref } from 'vue';
 import { useStopwatch } from './composables/useStopwatch';
 
 const {
@@ -162,8 +182,20 @@ const {
   pause,
   resume,
   reset,
+  addTime,
   formatTime
 } = useStopwatch();
+
+const showAdd = ref(false);
+const toAdd = reactive({ hours: 0, minutes: 0, seconds: 0 });
+
+function confirmAdd(): void {
+  const ms = (Object.keys(unitMs) as (keyof typeof unitMs)[])
+    .reduce((sum, u) => sum + Math.max(0, Math.floor(toAdd[u] || 0)) * unitMs[u], 0);
+  addTime(ms);
+  Object.assign(toAdd, { hours: 0, minutes: 0, seconds: 0 });
+  showAdd.value = false;
+}
 
 const time = computed(() => formatTime(elapsedTime.value));
 

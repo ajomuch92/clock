@@ -92,6 +92,12 @@ export function useStopwatch() {
     }
   }
 
+  // Shift startTime too, so resume() keeps the added time
+  function addTime(ms: number): void {
+    elapsedTime.value += ms;
+    if (startTime.value !== null) startTime.value -= ms;
+  }
+
   function reset(): void {
     if (intervalId !== null) {
       clearInterval(intervalId);
@@ -133,6 +139,7 @@ export function useStopwatch() {
     pause,
     resume,
     reset,
+    addTime,
     formatTime,
   };
 }
